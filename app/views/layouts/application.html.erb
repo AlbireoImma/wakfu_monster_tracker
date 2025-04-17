@@ -5,45 +5,67 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= 'logged-in' if current_user %>">
+  <body class="<%= 'logged-in' if current_user || anonymous_id %>">
     <header>
-      <div class="app-title">
-        <h1><%= link_to "Monster Tracker", root_path %></h1>
+      <div class="container">
+        <div class="header-content">
+          <div class="app-title">
+            <h1><%= link_to "Monster Tracker", root_path %></h1>
+          </div>
+          
+          <nav>
+            <% if current_user %>
+              <span>Logged in as: <%= current_user.email %></span>
+            <% elsif anonymous_id %>
+              <span>Anonymous tracking active</span>
+            <% end %>
+            
+            <%= link_to "Monster List", monsters_path %>
+            <%= link_to "My Tracked Monsters", tracked_monsters_path %>
+            <%= link_to "Notifications", notifications_path %>
+            
+            <% unless current_user %>
+              <%= link_to "Sign Up (Optional)", new_user_path %>
+            <% end %>
+          </nav>
+          
+          <!-- Chilean Time Clock -->
+          <div class="clock-display">
+            <div class="clock-label">⏱️ CL</div>
+            <div class="clock-time-container">
+              <div id="clock-time" class="clock-time">00:00:00</div>
+              <div id="clock-date" class="clock-date">Loading...</div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <nav>
-        <% if current_user %>
-          <span>Logged in as: <%= current_user.email %></span> |
-          <%= link_to "Monster List", monsters_path %> |
-          <%= link_to "My Tracked Monsters", tracked_monsters_path %> |
-          <%= link_to "Notifications", notifications_path %>
-        <% else %>
-          <%= link_to "Sign Up", new_user_path %>
-        <% end %>
-      </nav>
     </header>
     
-    <% if flash.any? %>
-      <div id="flash-messages">
-        <% flash.each do |type, message| %>
-          <div class="flash-<%= type %>">
-            <%= message %>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
+    <div class="container">
+      <% if flash.any? %>
+        <div id="flash-messages">
+          <% flash.each do |type, message| %>
+            <div class="flash-<%= type %>">
+              <%= message %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
 
-    <main>
-      <%= yield %>
-    </main>
+      <main>
+        <%= yield %>
+      </main>
+    </div>
     
     <footer>
-      <p>&copy; <%= Time.current.year %> Monster Tracker | Respawn timers: 60, 150, or 240 minutes</p>
+      <div class="container">
+        <p>&copy; <%= chilean_time.year %> Monster Tracker | Respawn timers: 60, 150, or 240 minutes | All times shown in Chilean time zone (GMT-4)</p>
+      </div>
     </footer>
   </body>
 </html>

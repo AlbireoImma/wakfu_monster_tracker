@@ -20,8 +20,13 @@ module MonsterTracker
     #
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
-    #
-    # config.time_zone = "Central Time (US & Canada)"
+    
+    # Set time zone to Chilean time (Santiago)
+    config.time_zone = "Santiago"
+    
+    # Set this true to use local time zone for time display
+    config.active_record.default_timezone = :local
+    
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

@@ -1,38 +1,98 @@
-<h1><%= @monster.name %></h1>
-
-<div class="monster-details">
-  <p><strong>Location:</strong> <%= @monster.location %></p>
-  <p><strong>Respawn Time:</strong> <%= @monster.respawn_time %> minutes</p>
-  <p><strong>Status:</strong> <%= @monster.status %></p>
+<div class="card mb-4">
+  <div class="card-title">
+    <%= @monster.name %>
+    <% if @monster.status == "active" %>
+      <span class="time-indicator time-spawned">Active</span>
+    <% else %>
+      <span class="time-indicator">Inactive</span>
+    <% end %>
+  </div>
   
-  <% if @monster.last_killed_at.present? %>
-    <p><strong>Last Killed At:</strong> <%= @monster.last_killed_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
-  <% end %>
+  <div class="monster-details">
+    <% if @monster.level.present? %>
+      <div class="mb-2">
+        <strong>Level:</strong> <%= @monster.level %>
+      </div>
+    <% end %>
+    
+    <div class="mb-2">
+      <strong>Location:</strong> <%= @monster.location %>
+    </div>
+    
+    <% if @monster.zone.present? %>
+      <div class="mb-2">
+        <strong>Zone:</strong> <%= @monster.zone %>
+      </div>
+    <% end %>
+    
+    <% if @monster.region.present? %>
+      <div class="mb-2">
+        <strong>Region:</strong> <%= @monster.region %>
+      </div>
+    <% end %>
+    
+    <div class="mb-2">
+      <strong>Respawn Time:</strong> 
+      <% if @monster.respawn_time == 60 %>
+        <span class="time-indicator time-short"><%= @monster.respawn_time %></span>
+      <% elsif @monster.respawn_time == 150 %>
+        <span class="time-indicator time-medium"><%= @monster.respawn_time %></span>
+      <% else %>
+        <span class="time-indicator time-long"><%= @monster.respawn_time %></span>
+      <% end %>
+      <span class="respawn-label">minutes</span>
+    </div>
+    
+    <% if @monster.last_killed_at.present? %>
+      <div class="mb-2">
+        <strong>Last Killed At:</strong> <%= @monster.last_killed_at.strftime("%Y-%m-%d %H:%M:%S") %>
+      </div>
+    <% end %>
+    
+    <% if @monster.tips.present? %>
+      <div class="mb-2 card">
+        <div class="card-title">Tips</div>
+        <p><%= @monster.tips %></p>
+      </div>
+    <% end %>
+  </div>
 </div>
 
-<div class="tracking-actions">
-  <% if current_user %>
+<div class="card mb-4">
+  <div class="card-title">Tracking Status</div>
+  
+  <div class="tracking-actions">
     <% if @tracked_monster %>
-      <p>
+      <div class="mb-3">
         <strong>Next Spawn Time:</strong> 
-        <%= @tracked_monster.next_spawn_time.strftime("%Y-%m-%d %H:%M:%S") %>
-        (<%= @tracked_monster.time_until_spawn %> minutes remaining)
-      </p>
+        <%= @tracked_monster.formatted_spawn_time %> (Chilean Time)
+        
+        <div class="mt-2">
+          <strong>Time Remaining:</strong>
+          <span class="countdown-timer" 
+                data-minutes="<%= @tracked_monster.time_until_spawn %>" 
+                data-seconds="<%= @tracked_monster.seconds_until_spawn %>"
+                data-reload-on-complete="true">
+            <%= sprintf("%02d:%02d", @tracked_monster.time_until_spawn, @tracked_monster.seconds_until_spawn) %>
+          </span>
+        </div>
+      </div>
       
-      <%= button_to "Reset Timer", reset_timer_tracked_monster_path(@tracked_monster), method: :patch %>
-      <%= button_to "Stop Tracking", tracked_monster_path(@tracked_monster), method: :delete %>
-      <%= button_to "Lost Track", lost_track_tracked_monster_path(@tracked_monster), method: :delete %>
+      <div class="mb-3">
+        <%= button_to "Reset Timer", reset_timer_tracked_monster_path(@tracked_monster), method: :patch, class: "reset-timer" %>
+        <%= button_to "Stop Tracking", tracked_monster_path(@tracked_monster), method: :delete, class: "stop-tracking" %>
+        <%= button_to "Lost Track", lost_track_tracked_monster_path(@tracked_monster), method: :delete, class: "lost-track" %>
+      </div>
     <% else %>
-      <%= button_to "Track This Monster", tracked_monsters_path(monster_id: @monster.id) %>
+      <div class="mb-3">
+        <p>You are not currently tracking this monster.</p>
+        <%= button_to "Track This Monster", tracked_monsters_path(monster_id: @monster.id), class: "track-monster mb-3" %>
+      </div>
     <% end %>
-  <% else %>
-    <p><%= link_to "Sign Up", new_user_path %> to track this monster!</p>
-  <% end %>
+  </div>
 </div>
 
 <div class="navigation">
   <%= link_to "Back to Monster List", monsters_path %>
-  <% if current_user %>
-    | <%= link_to "View Your Tracked Monsters", tracked_monsters_path %>
-  <% end %>
+  <%= link_to "View Your Tracked Monsters", tracked_monsters_path %>
 </div>

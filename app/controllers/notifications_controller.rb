@@ -1,8 +1,10 @@
 class NotificationsController < ApplicationController
-  before_action :require_login
-  
   def index
-    @notifiable_monsters = current_user.tracked_monsters.notifiable.includes(:monster)
+    if current_user
+      @notifiable_monsters = current_user.tracked_monsters.notifiable.includes(:monster)
+    else
+      @notifiable_monsters = TrackedMonster.where(anonymous_id: anonymous_id).notifiable.includes(:monster)
+    end
     
     respond_to do |format|
       format.html
@@ -18,18 +20,8 @@ class NotificationsController < ApplicationController
       monster_name: tracked_monster.monster.name,
       location: tracked_monster.monster.location,
       next_spawn_time: tracked_monster.next_spawn_time,
-      minutes_remaining: tracked_monster.time_until_spawn
+      minutes_remaining: tracked_monster.time_until_spawn,
+      seconds_remaining: tracked_monster.seconds_until_spawn
     }
   end
-  
-  def require_login
-    unless current_user
-      redirect_to new_user_path, alert: "You must sign in to view notifications."
-    end
-  end
-  
-  def current_user
-    @current_user ||= User.find_by(id: session[:user_id])
-  end
-  helper_method :current_user
 end

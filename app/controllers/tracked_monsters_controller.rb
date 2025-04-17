@@ -1,9 +1,8 @@
 class TrackedMonstersController < ApplicationController
-  before_action :require_login
   before_action :set_tracked_monster, only: [:destroy, :reset_timer, :lost_track]
   
   def index
-    @tracked_monsters = current_user.tracked_monsters.includes(:monster)
+    @tracked_monsters = tracked_monsters_scope.includes(:monster)
     @upcoming_monsters = @tracked_monsters.upcoming.order(:next_spawn_time)
     @spawned_monsters = @tracked_monsters.spawned.order(:next_spawn_time)
     
@@ -13,10 +12,19 @@ class TrackedMonstersController < ApplicationController
 
   def create
     @monster = Monster.find(params[:monster_id])
-    @tracked_monster = current_user.tracked_monsters.build(
-      monster: @monster,
-      next_spawn_time: Time.current + @monster.respawn_time.minutes
-    )
+    
+    @tracked_monster = if current_user
+      current_user.tracked_monsters.build(
+        monster: @monster,
+        next_spawn_time: Time.current + @monster.respawn_time.minutes
+      )
+    else
+      TrackedMonster.new(
+        monster: @monster,
+        next_spawn_time: Time.current + @monster.respawn_time.minutes,
+        anonymous_id: anonymous_id
+      )
+    end
     
     if @tracked_monster.save
       redirect_to tracked_monsters_path, notice: "Monster is now being tracked."
@@ -43,17 +51,14 @@ class TrackedMonstersController < ApplicationController
   private
   
   def set_tracked_monster
-    @tracked_monster = current_user.tracked_monsters.find(params[:id])
+    @tracked_monster = tracked_monsters_scope.find(params[:id])
   end
   
-  def require_login
-    unless current_user
-      redirect_to new_user_path, alert: "You must sign in to track monsters."
+  def tracked_monsters_scope
+    if current_user
+      current_user.tracked_monsters
+    else
+      TrackedMonster.where(anonymous_id: anonymous_id)
     end
   end
-  
-  def current_user
-    @current_user ||= User.find_by(id: session[:user_id])
-  end
-  helper_method :current_user
 end

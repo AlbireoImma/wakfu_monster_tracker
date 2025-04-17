@@ -1,45 +1,129 @@
-<h1>Monster List</h1>
-
-<% if current_user %>
-  <p>Welcome, <%= current_user.email %></p>
-  <p><%= link_to "View Your Tracked Monsters", tracked_monsters_path %></p>
-<% else %>
-  <p><%= link_to "Sign Up", new_user_path %> to track monsters!</p>
-<% end %>
-
-<% if current_user && current_user.email == "admin@example.com" %>
-  <p><%= link_to "Add New Monster", new_monster_path %></p>
-<% end %>
-
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Location</th>
-      <th>Respawn Time</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @monsters.each do |monster| %>
-      <tr>
-        <td><%= link_to monster.name, monster_path(monster) %></td>
-        <td><%= monster.location %></td>
-        <td><%= monster.respawn_time %> minutes</td>
-        <td><%= monster.status %></td>
-        <td>
-          <% if current_user %>
-            <% tracked = current_user.tracked_monsters.find_by(monster: monster) %>
-            <% if tracked %>
-              <%= button_to "Reset Timer", reset_timer_tracked_monster_path(tracked), method: :patch %>
-              <%= button_to "Stop Tracking", tracked_monster_path(tracked), method: :delete %>
-            <% else %>
-              <%= button_to "Track Monster", tracked_monsters_path(monster_id: monster.id) %>
-            <% end %>
-          <% end %>
-        </td>
-      </tr>
+<div class="card mb-4">
+  <div class="card-title">Monster List</div>
+  <div class="mb-3">
+    <% if current_user %>
+      <p class="mb-2">Welcome, <span class="text-bold"><%= current_user.email %></span></p>
     <% end %>
-  </tbody>
-</table>
+
+    <div class="mb-2">
+      <a href="<%= tracked_monsters_path %>" class="btn btn-primary">View Your Tracked Monsters</a>
+      
+      <% if current_user && current_user.email == "admin@example.com" %>
+        <a href="<%= new_monster_path %>" class="btn btn-success">Add New Monster</a>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-title">Filter & Search</div>
+  <div class="card-body">
+    <%= form_with(url: monsters_path, method: :get, local: true, class: "filter-form") do |form| %>
+      <div class="filter-group" style="display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-end;">
+        <div style="min-width: 180px;">
+          <%= form.label :respawn_time, "Respawn Time:" %>
+          <%= form.select :respawn_time, 
+                         options_for_select([
+                           ["All Respawn Times", ""],
+                           ["Short (60 min)", "60"], 
+                           ["Medium (150 min)", "150"], 
+                           ["Long (240 min)", "240"]
+                         ], params[:respawn_time]), 
+                         {}, { class: "filter-select" } %>
+        </div>
+        
+        <div style="min-width: 180px;">
+          <%= form.label :level_range, "Level Range:" %>
+          <%= form.select :level_range, 
+                         options_for_select([
+                           ["All Levels", ""],
+                           ["Low (23-58)", "low"], 
+                           ["Mid (68-119)", "mid"], 
+                           ["High (128-173)", "high"],
+                           ["Max (203+)", "max"]
+                         ], params[:level_range]), 
+                         {}, { class: "filter-select" } %>
+        </div>
+        
+        <div style="flex-grow: 1;">
+          <%= form.label :search, "Search:" %>
+          <%= form.text_field :search, 
+                             value: params[:search], 
+                             placeholder: "Search by name, zone, or region...",
+                             class: "filter-input",
+                             style: "width: 100%;" %>
+        </div>
+        
+        <div style="display: flex; gap: var(--space-2);">
+          <%= form.submit "Apply Filters", class: "btn btn-primary" %>
+          
+          <% if params[:respawn_time].present? || params[:search].present? || params[:level_range].present? %>
+            <a href="<%= monsters_path %>" class="btn btn-outline">Clear All</a>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+    <span>Monster List</span>
+    <span class="monster-count"><%= @monsters.count %> monsters found</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 22%;">Monster Name</th>
+        <th style="width: 10%;">Level</th>
+        <th style="width: 18%;">Zone</th>
+        <th style="width: 15%;">Region</th>
+        <th style="width: 10%;">Respawn</th>
+        <th style="width: 8%;">Status</th>
+        <th style="width: 17%;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @monsters.each do |monster| %>
+        <tr>
+          <td><strong><%= link_to monster.name, monster_path(monster) %></strong></td>
+          <td class="text-center"><%= monster.level %></td>
+          <td><%= monster.zone %></td>
+          <td><%= monster.region %></td>
+          <td class="text-center">
+            <% if monster.respawn_time == 60 %>
+              <span class="time-indicator time-short">
+                <%= monster.respawn_time %>
+              </span>
+            <% elsif monster.respawn_time == 150 %>
+              <span class="time-indicator time-medium">
+                <%= monster.respawn_time %>
+              </span>
+            <% else %>
+              <span class="time-indicator time-long">
+                <%= monster.respawn_time %>
+              </span>
+            <% end %>
+          </td>
+          <td><%= monster.status.capitalize %></td>
+          <td>
+            <% if current_user %>
+              <% tracked = current_user.tracked_monsters.find_by(monster: monster) %>
+            <% else %>
+              <% tracked = TrackedMonster.find_by(monster: monster, anonymous_id: anonymous_id) %>
+            <% end %>
+            
+            <div class="action-buttons">
+              <% if tracked %>
+                <%= button_to "Reset", reset_timer_tracked_monster_path(tracked), method: :patch, class: "reset-timer btn-sm" %>
+                <%= button_to "Untrack", tracked_monster_path(tracked), method: :delete, class: "stop-tracking btn-sm" %>
+              <% else %>
+                <%= button_to "Track", tracked_monsters_path(monster_id: monster.id), class: "track-monster btn-sm" %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,41 +1,64 @@
-<h1>Add New Monster</h1>
-
-<%= form_with(model: @monster, local: true) do |form| %>
-  <% if @monster.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@monster.errors.count, "error") %> prohibited this monster from being saved:</h2>
-      <ul>
-        <% @monster.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name, required: true %>
+<div class="card mb-4">
+  <div class="card-title">Add New Monster</div>
+  <div class="card-body">
+    <%= form_with(model: @monster, local: true) do |form| %>
+      <% if @monster.errors.any? %>
+        <div id="error_explanation" class="flash-alert mb-3">
+          <h3><%= pluralize(@monster.errors.count, "error") %> prohibited this monster from being saved:</h3>
+          <ul>
+            <% @monster.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    
+      <div class="field">
+        <%= form.label :name %>
+        <%= form.text_field :name, required: true, placeholder: "Monster name" %>
+      </div>
+    
+      <div class="field">
+        <%= form.label :level %>
+        <%= form.text_field :level, placeholder: "e.g. 23-28" %>
+      </div>
+    
+      <div class="field">
+        <%= form.label :zone %>
+        <%= form.text_field :zone, placeholder: "Monster's zone" %>
+      </div>
+    
+      <div class="field">
+        <%= form.label :region %>
+        <%= form.text_field :region, placeholder: "Region (optional)" %>
+      </div>
+    
+      <div class="field">
+        <%= form.label :location %>
+        <%= form.text_field :location, required: true, placeholder: "Specific location" %>
+      </div>
+    
+      <div class="field">
+        <%= form.label :respawn_time %>
+        <%= form.select :respawn_time, [60, 150, 240], required: true %>
+      </div>
+    
+      <div class="field">
+        <%= form.label :status %>
+        <%= form.select :status, ['active', 'inactive'], required: true %>
+      </div>
+    
+      <div class="field">
+        <%= form.label :tips %>
+        <%= form.text_area :tips, rows: 4, placeholder: "Combat tips for fighting this monster" %>
+      </div>
+    
+      <div class="actions">
+        <%= form.submit "Create Monster", class: "btn btn-primary" %>
+      </div>
+    <% end %>
   </div>
-
-  <div class="field">
-    <%= form.label :location %>
-    <%= form.text_field :location, required: true %>
-  </div>
-
-  <div class="field">
-    <%= form.label :respawn_time %>
-    <%= form.select :respawn_time, [60, 150, 240], required: true %>
-  </div>
-
-  <div class="field">
-    <%= form.label :status %>
-    <%= form.select :status, ['active', 'inactive'], required: true %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit "Create Monster" %>
-  </div>
-<% end %>
+</div>
 
 <div class="navigation">
   <%= link_to "Back to Monster List", monsters_path %>

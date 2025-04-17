@@ -24,9 +24,15 @@ class CheckSpawningMonstersJob < ApplicationJob
   private
   
   def log_notification(tracked)
+    user_info = if tracked.user
+                  "User: #{tracked.user.email}"
+                else
+                  "Anonymous user (ID: #{tracked.anonymous_id})"
+                end
+                
     Rails.logger.info(
       "NOTIFICATION: Monster #{tracked.monster.name} will spawn in #{tracked.time_until_spawn} minutes " +
-      "at #{tracked.monster.location}. User: #{tracked.user.email}"
+      "at #{tracked.monster.location}. #{user_info}"
     )
   end
   

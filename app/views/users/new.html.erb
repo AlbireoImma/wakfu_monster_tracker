@@ -1,23 +1,47 @@
-<h1>Sign Up</h1>
+<div class="card mb-4">
+  <div class="card-title">Sign Up (Optional)</div>
+  
+  <div class="card-body">
+    <p class="mb-3">
+      Creating an account allows your monster tracking data to persist across devices and browsers. 
+      However, tracking is available without an account!
+    </p>
+    
+    <%= form_with(model: @user, local: true) do |form| %>
+      <% if @user.errors.any? %>
+        <div id="error_explanation" class="flash-alert mb-3">
+          <h3><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h3>
+          <ul>
+            <% @user.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
 
-<%= form_with(model: @user, local: true) do |form| %>
-  <% if @user.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
-      <ul>
-        <% @user.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+      <div class="field">
+        <%= form.label :email %>
+        <%= form.email_field :email, required: true, placeholder: "your.email@example.com" %>
+      </div>
 
-  <div class="field">
-    <%= form.label :email %>
-    <%= form.email_field :email, required: true %>
+      <div class="actions">
+        <%= form.submit "Create Account", class: "btn btn-primary" %>
+        <a href="<%= monsters_path %>" class="btn">Continue as Guest</a>
+      </div>
+    <% end %>
   </div>
+</div>
 
-  <div class="actions">
-    <%= form.submit "Sign Up" %>
+<div class="card">
+  <div class="card-title">Anonymous Tracking</div>
+  <div class="card-body">
+    <p>As an anonymous user, you can still:</p>
+    <ul class="mb-3">
+      <li>Track monster respawn times</li>
+      <li>Receive notifications when monsters are about to spawn</li>
+      <li>Reset timers and lose track of monsters</li>
+    </ul>
+    <p class="mb-3">Your tracking data is stored in your browser's session and will be lost if you clear cookies or use a different browser.</p>
+    <a href="<%= monsters_path %>" class="btn btn-primary">Start Tracking Now</a>
   </div>
-<% end %>
+</div>

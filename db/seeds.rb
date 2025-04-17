@@ -1,4 +1,4 @@
-# Create default monsters with different respawn times
+require 'csv'
 
 # Reset tables
 puts "Cleaning database..."
@@ -6,74 +6,41 @@ TrackedMonster.destroy_all
 Monster.destroy_all
 User.destroy_all
 
-# Create monsters
-puts "Creating monsters..."
+# Create monsters from CSV
+puts "Creating monsters from CSV file..."
+csv_file_path = Rails.root.join('data.csv')
 
-# 60-minute respawn monsters
-Monster.create!(
-  name: "Forest Troll",
-  respawn_time: 60,
-  location: "Western Forest - Near the old bridge",
-  status: "active"
-)
-
-Monster.create!(
-  name: "Cave Bat",
-  respawn_time: 60,
-  location: "Northern Caves - Entrance chamber",
-  status: "active"
-)
-
-# 150-minute respawn monsters
-Monster.create!(
-  name: "Mountain Giant",
-  respawn_time: 150,
-  location: "Eastern Mountains - Summit peak",
-  status: "active"
-)
-
-Monster.create!(
-  name: "Swamp Beast",
-  respawn_time: 150,
-  location: "Southern Swamps - Deep in the marshes",
-  status: "active"
-)
-
-# 240-minute respawn monsters
-Monster.create!(
-  name: "Ancient Dragon",
-  respawn_time: 240,
-  location: "Volcano Crater - Central island",
-  status: "active"
-)
-
-Monster.create!(
-  name: "Frost Wyrm",
-  respawn_time: 240,
-  location: "Frozen Peaks - Ice cavern",
-  status: "active"
-)
+if File.exist?(csv_file_path)
+  CSV.foreach(csv_file_path, headers: true) do |row|
+    # Skip if any required field is missing
+    next if row['Archmonster Name'].blank? || row['Respawn Time (Minutes)'].blank?
+    
+    respawn_time = row['Respawn Time (Minutes)'].to_i
+    
+    # Only accept respawn times of 60, 150, or 240 minutes
+    next unless [60, 150, 240].include?(respawn_time)
+    
+    # Create the monster
+    Monster.create!(
+      name: row['Archmonster Name'],
+      respawn_time: respawn_time,
+      location: "#{row['Zone']}#{', ' + row['Region'] unless row['Region'].blank?}",
+      status: "active",
+      level: row['Level'],
+      zone: row['Zone'],
+      region: row['Region'],
+      tips: row['Tips']
+    )
+    
+    puts "Created #{row['Archmonster Name']} (#{respawn_time} min respawn)"
+  end
+  puts "CSV import completed."
+else
+  puts "CSV file not found at #{csv_file_path}!"
+end
 
 # Create admin user
 puts "Creating admin user..."
 admin = User.create!(email: "admin@example.com")
-
-# Create a regular user
-puts "Creating regular user..."
-user = User.create!(email: "user@example.com")
-
-# Track some monsters for testing
-puts "Creating tracked monsters..."
-TrackedMonster.create!(
-  user: user,
-  monster: Monster.find_by(name: "Forest Troll"),
-  next_spawn_time: Time.current + 10.minutes
-)
-
-TrackedMonster.create!(
-  user: user,
-  monster: Monster.find_by(name: "Mountain Giant"),
-  next_spawn_time: Time.current + 3.minutes
-)
 
 puts "Seed data created successfully!"
