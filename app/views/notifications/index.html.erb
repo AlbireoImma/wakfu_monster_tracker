@@ -1,0 +1,39 @@
+<h1>Monster Notifications</h1>
+
+<% if @notifiable_monsters.any? %>
+  <div class="notifications alert alert-warning">
+    <h3>Monsters about to spawn!</h3>
+    <ul>
+      <% @notifiable_monsters.each do |tracked| %>
+        <li>
+          <strong><%= tracked.monster.name %></strong> will spawn in <%= tracked.time_until_spawn %> minutes at <%= tracked.monster.location %>
+          <%= link_to "View Details", monster_path(tracked.monster) %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% else %>
+  <p>No monsters about to spawn at this time.</p>
+<% end %>
+
+<div class="navigation">
+  <%= link_to "Back to Monster List", monsters_path %>
+  | <%= link_to "View Your Tracked Monsters", tracked_monsters_path %>
+</div>
+
+<style>
+  .notifications {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+</style>
+
+<script>
+  // Automatic refresh every 30 seconds
+  setTimeout(function() {
+    window.location.reload();
+  }, 30000);
+</script>

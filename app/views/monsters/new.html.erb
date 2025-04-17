@@ -1,0 +1,42 @@
+<h1>Add New Monster</h1>
+
+<%= form_with(model: @monster, local: true) do |form| %>
+  <% if @monster.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@monster.errors.count, "error") %> prohibited this monster from being saved:</h2>
+      <ul>
+        <% @monster.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :location %>
+    <%= form.text_field :location, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :respawn_time %>
+    <%= form.select :respawn_time, [60, 150, 240], required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :status %>
+    <%= form.select :status, ['active', 'inactive'], required: true %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Create Monster" %>
+  </div>
+<% end %>
+
+<div class="navigation">
+  <%= link_to "Back to Monster List", monsters_path %>
+</div>

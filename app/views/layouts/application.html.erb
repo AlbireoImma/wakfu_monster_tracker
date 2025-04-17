@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Monster Tracker</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="<%= 'logged-in' if current_user %>">
+    <header>
+      <div class="app-title">
+        <h1><%= link_to "Monster Tracker", root_path %></h1>
+      </div>
+      
+      <nav>
+        <% if current_user %>
+          <span>Logged in as: <%= current_user.email %></span> |
+          <%= link_to "Monster List", monsters_path %> |
+          <%= link_to "My Tracked Monsters", tracked_monsters_path %> |
+          <%= link_to "Notifications", notifications_path %>
+        <% else %>
+          <%= link_to "Sign Up", new_user_path %>
+        <% end %>
+      </nav>
+    </header>
+    
+    <% if flash.any? %>
+      <div id="flash-messages">
+        <% flash.each do |type, message| %>
+          <div class="flash-<%= type %>">
+            <%= message %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <main>
+      <%= yield %>
+    </main>
+    
+    <footer>
+      <p>&copy; <%= Time.current.year %> Monster Tracker | Respawn timers: 60, 150, or 240 minutes</p>
+    </footer>
+  </body>
+</html>

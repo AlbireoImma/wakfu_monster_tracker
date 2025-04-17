@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  monster: one
+  next_spawn_time: 2025-04-17 18:02:06
+
+two:
+  user: two
+  monster: two
+  next_spawn_time: 2025-04-17 18:02:06

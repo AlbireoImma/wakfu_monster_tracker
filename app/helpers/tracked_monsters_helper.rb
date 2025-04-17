@@ -1,0 +1,2 @@
+module TrackedMonstersHelper
+end

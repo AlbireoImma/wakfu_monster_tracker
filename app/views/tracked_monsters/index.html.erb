@@ -1,0 +1,91 @@
+<h1>Your Tracked Monsters</h1>
+
+<% if @notifiable_monsters.any? %>
+  <div class="notifications alert alert-warning">
+    <h3>Monsters about to spawn!</h3>
+    <ul>
+      <% @notifiable_monsters.each do |tracked| %>
+        <li>
+          <strong><%= tracked.monster.name %></strong> will spawn in <%= tracked.time_until_spawn %> minutes at <%= tracked.monster.location %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% if @upcoming_monsters.any? %>
+  <h2>Upcoming Monsters</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Next Spawn Time</th>
+        <th>Time Remaining</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @upcoming_monsters.each do |tracked| %>
+        <tr class="<%= 'about-to-spawn' if tracked.notifiable? %>">
+          <td><%= link_to tracked.monster.name, monster_path(tracked.monster) %></td>
+          <td><%= tracked.monster.location %></td>
+          <td><%= tracked.next_spawn_time.strftime("%Y-%m-%d %H:%M:%S") %></td>
+          <td><%= tracked.time_until_spawn %> minutes</td>
+          <td>
+            <%= button_to "Reset Timer", reset_timer_tracked_monster_path(tracked), method: :patch %>
+            <%= button_to "Lost Track", lost_track_tracked_monster_path(tracked), method: :delete %>
+            <%= button_to "Stop Tracking", tracked_monster_path(tracked), method: :delete %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No upcoming monsters.</p>
+<% end %>
+
+<% if @spawned_monsters.any? %>
+  <h2>Monsters That Have Spawned</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Spawn Time</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @spawned_monsters.each do |tracked| %>
+        <tr>
+          <td><%= link_to tracked.monster.name, monster_path(tracked.monster) %></td>
+          <td><%= tracked.monster.location %></td>
+          <td><%= tracked.next_spawn_time.strftime("%Y-%m-%d %H:%M:%S") %></td>
+          <td>
+            <%= button_to "Reset Timer", reset_timer_tracked_monster_path(tracked), method: :patch %>
+            <%= button_to "Stop Tracking", tracked_monster_path(tracked), method: :delete %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<div class="navigation">
+  <%= link_to "Back to Monster List", monsters_path %>
+</div>
+
+<style>
+  .about-to-spawn {
+    background-color: #fff3cd;
+  }
+  
+  .notifications {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+</style>

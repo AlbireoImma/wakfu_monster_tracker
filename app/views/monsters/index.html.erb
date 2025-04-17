@@ -1,0 +1,45 @@
+<h1>Monster List</h1>
+
+<% if current_user %>
+  <p>Welcome, <%= current_user.email %></p>
+  <p><%= link_to "View Your Tracked Monsters", tracked_monsters_path %></p>
+<% else %>
+  <p><%= link_to "Sign Up", new_user_path %> to track monsters!</p>
+<% end %>
+
+<% if current_user && current_user.email == "admin@example.com" %>
+  <p><%= link_to "Add New Monster", new_monster_path %></p>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Location</th>
+      <th>Respawn Time</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @monsters.each do |monster| %>
+      <tr>
+        <td><%= link_to monster.name, monster_path(monster) %></td>
+        <td><%= monster.location %></td>
+        <td><%= monster.respawn_time %> minutes</td>
+        <td><%= monster.status %></td>
+        <td>
+          <% if current_user %>
+            <% tracked = current_user.tracked_monsters.find_by(monster: monster) %>
+            <% if tracked %>
+              <%= button_to "Reset Timer", reset_timer_tracked_monster_path(tracked), method: :patch %>
+              <%= button_to "Stop Tracking", tracked_monster_path(tracked), method: :delete %>
+            <% else %>
+              <%= button_to "Track Monster", tracked_monsters_path(monster_id: monster.id) %>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

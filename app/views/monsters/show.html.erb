@@ -1,0 +1,38 @@
+<h1><%= @monster.name %></h1>
+
+<div class="monster-details">
+  <p><strong>Location:</strong> <%= @monster.location %></p>
+  <p><strong>Respawn Time:</strong> <%= @monster.respawn_time %> minutes</p>
+  <p><strong>Status:</strong> <%= @monster.status %></p>
+  
+  <% if @monster.last_killed_at.present? %>
+    <p><strong>Last Killed At:</strong> <%= @monster.last_killed_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
+  <% end %>
+</div>
+
+<div class="tracking-actions">
+  <% if current_user %>
+    <% if @tracked_monster %>
+      <p>
+        <strong>Next Spawn Time:</strong> 
+        <%= @tracked_monster.next_spawn_time.strftime("%Y-%m-%d %H:%M:%S") %>
+        (<%= @tracked_monster.time_until_spawn %> minutes remaining)
+      </p>
+      
+      <%= button_to "Reset Timer", reset_timer_tracked_monster_path(@tracked_monster), method: :patch %>
+      <%= button_to "Stop Tracking", tracked_monster_path(@tracked_monster), method: :delete %>
+      <%= button_to "Lost Track", lost_track_tracked_monster_path(@tracked_monster), method: :delete %>
+    <% else %>
+      <%= button_to "Track This Monster", tracked_monsters_path(monster_id: @monster.id) %>
+    <% end %>
+  <% else %>
+    <p><%= link_to "Sign Up", new_user_path %> to track this monster!</p>
+  <% end %>
+</div>
+
+<div class="navigation">
+  <%= link_to "Back to Monster List", monsters_path %>
+  <% if current_user %>
+    | <%= link_to "View Your Tracked Monsters", tracked_monsters_path %>
+  <% end %>
+</div>
