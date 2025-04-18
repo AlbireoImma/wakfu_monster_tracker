@@ -78,7 +78,10 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  database: monster_tracker_production
+  adapter: postgresql
+  encoding: unicode
+  database: monster_tracker_database
   username: monster_tracker
-  password: <%= ENV["MONSTER_TRACKER_DATABASE_PASSWORD"] %>
+  password: warofworld
+  host: localhost # Or your database server's hostname
+  port: 5432 # Or your database server's port
