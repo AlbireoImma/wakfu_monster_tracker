@@ -82,6 +82,6 @@ production:
   encoding: unicode
   database: monster_tracker_database
   username: monster_tracker
-  password: warofworld
+  password: <%= Rails.application.credentials.production.database_password %>
   host: localhost # Or your database server's hostname
   port: 5432 # Or your database server's port
