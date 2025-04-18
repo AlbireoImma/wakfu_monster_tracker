@@ -86,11 +86,11 @@
     <tbody>
       <% @monsters.each do |monster| %>
         <tr>
-          <td><strong><%= link_to monster.name, monster_path(monster) %></strong></td>
-          <td class="text-center"><%= monster.level %></td>
-          <td><%= monster.zone %></td>
-          <td><%= monster.region %></td>
-          <td class="text-center">
+          <td data-label="Monster Name"><strong><%= link_to monster.name, monster_path(monster) %></strong></td>
+          <td data-label="Level" class="text-center"><%= monster.level %></td>
+          <td data-label="Zone"><%= monster.zone %></td>
+          <td data-label="Region"><%= monster.region %></td>
+          <td data-label="Respawn" class="text-center">
             <% if monster.respawn_time == 60 %>
               <span class="time-indicator time-short">
                 <%= monster.respawn_time %>
@@ -105,8 +105,8 @@
               </span>
             <% end %>
           </td>
-          <td><%= monster.status.capitalize %></td>
-          <td>
+          <td data-label="Status"><%= monster.status.capitalize %></td>
+          <td data-label="Actions">
             <% if current_user %>
               <% tracked = current_user.tracked_monsters.find_by(monster: monster) %>
             <% else %>

@@ -693,6 +693,24 @@ button.lost-track:hover {
   margin-left: auto;
 }
 
+@media (max-width: 768px) {
+  .notifications li {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-4) 0;
+  }
+  
+  .notifications li .btn {
+    margin-left: 0;
+    margin-top: var(--space-2);
+    width: 100%;
+  }
+  
+  .notifications li .time-indicator {
+    margin: var(--space-2) 0;
+  }
+}
+
 /* Monster details */
 .monster-details {
   background-color: var(--secondary-light);
@@ -995,6 +1013,7 @@ footer p {
     flex-direction: column;
     padding: var(--space-4) 0;
     gap: var(--space-4);
+    row-gap: var(--space-2);
   }
   
   nav {
@@ -1002,6 +1021,9 @@ footer p {
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-3);
+    order: 3;
+    width: 100%;
+    justify-content: center;
   }
   
   nav a, nav span {
@@ -1021,14 +1043,120 @@ footer p {
     font-size: var(--font-size-base);
   }
   
+  /* Responsive tables - Stack for mobile */
   table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
     display: block;
-    overflow-x: auto;
   }
   
-  th, td {
-    padding: var(--space-3) var(--space-3);
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  
+  thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  tr {
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+    box-shadow: var(--card-shadow);
+    background: var(--card-bg);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+  
+  tr:last-child {
+    margin-bottom: 0;
+  }
+  
+  td {
+    position: relative;
+    padding: 0.8rem var(--space-4) !important;
+    padding-left: 40% !important;
+    padding-right: var(--space-4) !important;
+    text-align: right !important;
+    border-bottom: 1px solid var(--border-color);
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     font-size: 0.9rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    flex-wrap: wrap;
+    word-break: break-word;
+  }
+  
+  td:before {
+    content: attr(data-label);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 37%;
+    height: 100%;
+    padding: 0.8rem var(--space-3);
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    background-color: var(--secondary-light);
+    border-right: 1px solid var(--border-color);
+    z-index: 1;
+  }
+  
+  td:last-child {
+    border-bottom: none;
+  }
+  
+  td.text-center {
+    text-align: right !important;
+    justify-content: flex-end;
+  }
+  
+  .time-indicator {
+    min-width: 40px;
+  }
+  
+  td[data-label="Actions"] {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    min-height: 60px;
+    height: auto;
+    align-items: flex-start;
+    width: calc(100% - 8px) !important;
+    box-sizing: border-box;
+  }
+  
+  td[data-label="Actions"] .action-buttons {
+    width: 60% !important;
+    margin-left: auto;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: var(--space-2);
+  }
+  
+  .action-buttons .btn-sm {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem;
+    box-sizing: border-box;
+  }
+  
+  .action-buttons form {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
   }
   
   .clock-display {
@@ -1037,24 +1165,39 @@ footer p {
     align-self: center;
   }
   
-  .header-content {
-    row-gap: var(--space-2);
-  }
-  
-  nav {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-  }
-  
   .btn, button, input[type="submit"] {
     padding: 0.45rem 0.9rem;
     font-size: 0.8rem;
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+    word-break: break-word;
   }
   
   .navigation {
     flex-direction: column;
     gap: var(--space-3);
+  }
+  
+  /* Responsive filters */
+  .filter-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .filter-group > div {
+    width: 100% !important;
+    min-width: 100% !important;
+    margin-bottom: var(--space-3);
+  }
+  
+  .filter-group > div:last-child {
+    display: flex;
+    gap: var(--space-2);
+  }
+  
+  .filter-group > div:last-child .btn {
+    flex: 1;
   }
 }
 
@@ -1103,6 +1246,33 @@ footer p {
   padding: 0.3rem 0.6rem;
   font-size: 0.75rem;
   margin: 0;
+}
+
+/* Form fixes for button overflow */
+td .action-buttons form,
+td .action-buttons button {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  td[data-label="Actions"] {
+    padding-right: var(--space-4) !important;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .action-buttons {
+    width: 100%;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  
+  .action-buttons form,
+  .action-buttons button {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
 }
 
 /* Utility classes */
